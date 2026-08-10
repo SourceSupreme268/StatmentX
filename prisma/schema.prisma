@@ -1,0 +1,171 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum StatementStatus {
+  processing
+  completed
+  failed
+}
+
+enum TransactionType {
+  credit
+  debit
+  opening_balance
+}
+
+enum ExportFormat {
+  xlsx
+  csv
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+// A user-uploaded bank statement and its processing status.
+//
+// No local `User` model: `userId` is the Clerk user ID (a string) used
+// directly as the ownership key. See tracker decision — Clerk already owns
+// identity, and V1 has no need for a local user row (no profile fields we
+// manage ourselves, no relations Clerk doesn't already give us via its ID).
+//
+// V2 reminder (per tracker): store the original uploaded PDF (e.g. in S3 or
+// a similar blob store), with a `sourceFileUrl`/`sourceFileKey` column here.
+// V1 deliberately does not persist the PDF — only extracted data.
+model Statement {
+  id        String   @id @default(cuid())
+  userId    String
+  fileName  String
+  bank      String
+
+  statementPeriodStart DateTime
+  statementPeriodEnd   DateTime
+
+  status   StatementStatus @default(processing)
+  errorMessage String? // populated when status = failed, for debugging/support
+
+  uploadedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  transactions Transaction[]
+  exports      Export[]
+
+  @@index([userId])
+  @@index([userId, uploadedAt])
+}
+
+// A single transaction line extracted from a Statement.
+//
+// `amount` is signed (negative = debit, positive = credit), matching the
+// in-app TransactionRow type already used across Dashboard/Transactions UI.
+// This intentionally differs from the *exported file* spec (separate
+// Debit/Credit columns) — that split is derived at export-generation time
+// from this signed amount, not stored twice. See tracker decision.
+model Transaction {
+  id          String           @id @default(cuid())
+  statementId String
+  statement   Statement        @relation(fields: [statementId], references: [id], onDelete: Cascade)
+
+  date        DateTime
+  description String
+  type        TransactionType
+  amount      Decimal          @db.Decimal(14, 2)
+  balance     Decimal          @db.Decimal(14, 2)
+
+  reference String? // optional, per the exported-file spec ("if available")
+
+  createdAt DateTime @default(now())
+
+  @@index([statementId])
+  @@index([statementId, date])
+}
+
+// A generated export file (Excel or CSV) tied back to its source statement.
+//
+// V1: synchronous only — a row is created once generation succeeds, no
+// pending/failed status. V2 reminder (per tracker): add an async job model
+// with a status field (pending/ready/failed) if export generation ever
+// becomes slow enough to need background processing.
+model Export {
+  id     String @id @default(cuid())
+  userId String
+
+  statementId String
+  statement   Statement @relation(fields: [statementId], references: [id], onDelete: Cascade)
+
+  fileName String
+  format   ExportFormat
+
+  // V1 has no file storage wired up yet (see Statement's V2 reminder above,
+  // same applies here) — this is where a blob-store URL/key will go once
+  // that exists. Nullable until then.
+  fileUrl String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([statementId])
+}
+
+enum ThemePreference {
+  light
+  dark
+}
+
+enum BugSeverity {
+  low
+  medium
+  high
+  critical
+}
+
+model UserPreferences {
+  userId String @id
+
+  theme               ThemePreference @default(light)
+  defaultExportFormat ExportFormat    @default(xlsx)
+  dateFormat          String          @default("mm-dd-yyyy")
+  timeZone            String          @default("UTC")
+
+  updatedAt DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id     String  @id @default(cuid())
+  userId String?
+
+  name    String
+  email   String
+  message String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model BugReport {
+  id     String  @id @default(cuid())
+  userId String?
+
+  title             String
+  description       String
+  stepsToReproduce  String?
+  severity          BugSeverity @default(low)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
