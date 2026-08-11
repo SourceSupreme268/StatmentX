@@ -10,11 +10,6 @@ interface RouteParams {
   params: Promise<{ exportId: string }>;
 }
 
-// UTF-8 byte order mark — without this, Excel on Windows sometimes
-// misreads a plain UTF-8 CSV's encoding and/or fails to recognize the
-// file type cleanly in its Open dialog (reported symptom: file doesn't
-// show up unless "All Files" is selected). Prepending the BOM is the
-// standard fix for Excel/CSV interop on Windows.
 const UTF8_BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -53,7 +48,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     contentType = "text/csv; charset=utf-8";
   }
 
-  return new NextResponse(buffer, {
+  const responseBody = new Uint8Array(buffer);
+
+  return new NextResponse(responseBody, {
     status: 200,
     headers: {
       "Content-Type": contentType,
