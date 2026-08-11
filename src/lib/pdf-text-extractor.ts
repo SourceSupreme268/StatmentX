@@ -16,12 +16,17 @@ interface Pdf2JsonOutput {
   Pages: Pdf2JsonPage[];
 }
 
+function extractParserError(errData: Error | { parserError: Error }): Error {
+  if (errData instanceof Error) return errData;
+  return errData.parserError;
+}
+
 export async function extractTextFromPdf(fileBuffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
     const parser = new PDFParser();
 
-    parser.on("pdfParser_dataError", (errData: { parserError: Error }) => {
-      reject(errData.parserError);
+    parser.on("pdfParser_dataError", (errData: Error | { parserError: Error }) => {
+      reject(extractParserError(errData));
     });
 
     parser.on("pdfParser_dataReady", (pdfData: Pdf2JsonOutput) => {
