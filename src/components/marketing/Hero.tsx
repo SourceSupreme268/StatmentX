@@ -21,7 +21,7 @@ const TRUST_POINTS = [
 
 export function Hero() {
   return (
-    <section className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
+    <section className="mx-auto lg:h-[85vh] max-w-7xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
         <div>
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-5xl">

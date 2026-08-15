@@ -91,13 +91,13 @@ export function PreferencesTab({ initialPreferences }: PreferencesTabProps) {
       </div> */}
 
       <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5 shadow-card">
-        <div>
+        <div className="mr-2">
           <h3 className="text-sm font-semibold text-gray-900">Sign out</h3>
           <p className="mt-0.5 text-xs text-gray-500">
             Sign out of your account on this device.
           </p>
         </div>
-        <SignOutButton variant="light" />
+        <SignOutButton  variant="light" />
       </div>
 
       <DeleteAccountSection />

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthBrandPanel } from "@/components/auth/AuthBrandPanel";
+import { BackToHomeLink } from "@/components/auth/BackToHomeLink";
+
 
 function toErrorMessage(value: unknown): string | null {
   if (!value) return null;
@@ -119,6 +121,7 @@ export default function SignUpPage() {
 
       <div className="flex flex-[2] items-center justify-center overflow-y-auto px-6 py-6 lg:flex-[3]">
         <div className="w-full max-w-sm">
+          <BackToHomeLink />
           <div id="clerk-captcha" />
           {step === "details" ? (
             <>

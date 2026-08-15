@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import { DashboardTopBar } from "@/components/layout/DashboardTopBar";
 import { StatementBreadcrumb } from "@/components/dashboard/StatementBreadcrumb";
 import { TransactionSummaryCards } from "@/components/dashboard/TransactionSummaryCards";
-import { TransactionsToolbar } from "@/components/dashboard/TransactionsToolbar";
-import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
+import { StatementTransactionsSection } from "@/components/dashboard/StatementTransactionsSection";
 import { getStatementWithTransactions } from "@/lib/statements-data";
 import { toTransactionRow } from "@/lib/statement-mappers";
 import { summarizeTransactions } from "@/lib/transactions";
@@ -53,8 +52,10 @@ export default async function StatementDetailPage({
             )}
 
             <TransactionSummaryCards summary={summary} />
-            <TransactionsToolbar statementId={statementId} />
-            <TransactionsTable transactions={transactionsForStatement} />
+            <StatementTransactionsSection
+              transactions={transactionsForStatement}
+              statementId={statementId}
+            />
           </>
         ) : (
           <div className="rounded-xl border border-gray-200 py-16 text-center shadow-card">

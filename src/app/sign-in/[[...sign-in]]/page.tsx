@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthBrandPanel } from "@/components/auth/AuthBrandPanel";
+import { BackToHomeLink } from "@/components/auth/BackToHomeLink";
 
 // Clerk's error objects (both `errors.global` and individual field errors)
 // have a {code, message, longMessage, meta} shape, NOT a plain string —
@@ -90,8 +91,9 @@ export default function SignInPage() {
     <div className="flex h-screen w-full overflow-hidden">
       <AuthBrandPanel />
 
-      <div className="flex flex-[2] items-center justify-center overflow-y-auto px-6 py-6 lg:flex-[3]">
+   <div className="flex flex-[2] items-start justify-center overflow-y-auto px-6 py-10 sm:items-center sm:py-6 lg:flex-[3]">
         <div className="w-full max-w-sm">
+          <BackToHomeLink />
           <div className="mb-4">
             <h1 className="text-lg font-semibold text-gray-900">
               Welcome back
@@ -125,17 +127,23 @@ export default function SignInPage() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-xs font-medium text-gray-700">
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-brand-500 hover:text-brand-600"
-                >
-                  Forgot password?
-                </Link>
+              
+              <div className="flex items-center justify-between gap-4">
+              <label
+                      htmlFor="password"
+                      className="text-xs font-medium text-gray-700"
+                      >
+                      Password
+                      </label>
+              <Link
+                      href="/forgot-password"
+                      className="rounded px-1 py-1 text-xs font-medium text-brand-500 hover:text-brand-600"
+                      >
+                      Forgot password?
+                      </Link>
               </div>
+
+
               <div className="relative">
                 <input
                   id="password"

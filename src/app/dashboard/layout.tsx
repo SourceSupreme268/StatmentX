@@ -10,17 +10,17 @@ export default function DashboardLayout({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="h-screen">
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
 
-      <div className="min-w-0 flex-1">
+      <div className="flex h-screen flex-col lg:pl-60">
         <DashboardMobileHeader
           onMenuClick={() => setIsMobileSidebarOpen(true)}
         />
-        <main>{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
